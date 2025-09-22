@@ -10,9 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestControllerAdvice
 @Slf4j
 public class ExceptionHandler {
@@ -43,7 +40,7 @@ public class ExceptionHandler {
     public ResponseEntity<ErrorInfo> handleException(Exception ex, HttpServletRequest request) {
         log.error(ex.getMessage(), ex);
         ErrorInfo errorInfo = ErrorInfo.builder()
-                .message(ex.getMessage())
+                .message("Internal error.")
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .typeError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .path(request.getRequestURI())
