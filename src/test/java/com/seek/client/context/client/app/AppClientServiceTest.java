@@ -1,6 +1,7 @@
 package com.seek.client.context.client.app;
 
 import com.seek.client.context.client.domain.Client;
+import com.seek.client.context.client.domain.ClientPublisher;
 import com.seek.client.context.client.domain.ClientRepository;
 import com.seek.client.context.client.domain.dto.ClientDto;
 import com.seek.client.context.client.domain.dto.PageResponse;
@@ -23,6 +24,9 @@ class AppClientServiceTest {
     @Mock
     private ClientRepository clientRepository;
 
+    @Mock
+    private ClientPublisher clientPublisher;
+
     @InjectMocks
     private AppClientService appClientService;
 
@@ -31,7 +35,7 @@ class AppClientServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        appClientService = new AppClientService(clientRepository);
+        appClientService = new AppClientService(clientRepository, clientPublisher);
         TestUtils.setField(appClientService, "fixedLifeExpectancy", FIXED_LIFE_EXPECTANCY);
     }
 
