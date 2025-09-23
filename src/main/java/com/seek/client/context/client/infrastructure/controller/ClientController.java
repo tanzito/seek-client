@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,6 +42,7 @@ public class ClientController {
     @ApiResponse(responseCode = "400", description = "Error de petición")
     @Operation(summary = "Guardar un cliente", description = "")
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<ClientDto> create(@RequestBody @Valid() ClientSaveRequest clientSaveRequest) {
         log.info("creating client {}", clientSaveRequest);
         return ResponseEntity.ok(this.clientService.save(clientSaveRequest.toModel()));

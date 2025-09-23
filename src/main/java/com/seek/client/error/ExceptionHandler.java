@@ -3,10 +3,13 @@ package com.seek.client.error;
 
 import com.seek.client.context.client.domain.exception.DomainException;
 import com.seek.client.context.client.domain.exception.NotFoundException;
+import com.seek.client.context.security.domain.AuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -36,6 +39,18 @@ public class ExceptionHandler {
         return new ResponseEntity<>(errorInfo, HttpStatus.NOT_FOUND);
     }
 
+    @org.springframework.web.bind.annotation.ExceptionHandler(exception = {AuthException.class, BadCredentialsException.class})
+    public ResponseEntity<ErrorInfo> handleException(RuntimeException ex, HttpServletRequest request) {
+        log.error(ex.getMessage(), ex);
+        ErrorInfo errorInfo = ErrorInfo.builder()
+                .message("Username or password is incorrect")
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .typeError(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(errorInfo, HttpStatus.UNAUTHORIZED);
+    }
+
     @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorInfo> handleException(Exception ex, HttpServletRequest request) {
         log.error(ex.getMessage(), ex);
@@ -46,6 +61,18 @@ public class ExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
         return ResponseEntity.internalServerError().body(errorInfo);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorInfo> handleException(AuthorizationDeniedException ex, HttpServletRequest request) {
+        log.error(ex.getMessage(), ex);
+        ErrorInfo errorInfo = ErrorInfo.builder()
+                .message("Forbidden.")
+                .status(HttpStatus.FORBIDDEN.value())
+                .typeError(HttpStatus.FORBIDDEN.getReasonPhrase())
+                .path(request.getRequestURI())
+                .build();
+        return new ResponseEntity<>(errorInfo, HttpStatus.FORBIDDEN);
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
