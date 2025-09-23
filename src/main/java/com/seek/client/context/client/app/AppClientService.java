@@ -1,6 +1,7 @@
 package com.seek.client.context.client.app;
 
 import com.seek.client.context.client.domain.Client;
+import com.seek.client.context.client.domain.ClientPublisher;
 import com.seek.client.context.client.domain.ClientRepository;
 import com.seek.client.context.client.domain.ClientService;
 import com.seek.client.context.client.domain.dto.ClientDto;
@@ -17,19 +18,25 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class AppClientService implements ClientService {
-    private final ClientRepository clientRepository;
+
     @Value("${client.fixedLifeExpectancy}")
     private Integer fixedLifeExpectancy;
 
-    public AppClientService(ClientRepository clientRepository) {
+    private final ClientRepository clientRepository;
+    private final ClientPublisher clientPublisher;
+
+    public AppClientService(ClientRepository clientRepository, ClientPublisher clientPublisher) {
         this.clientRepository = clientRepository;
+        this.clientPublisher = clientPublisher;
     }
 
 
     @Override
     public ClientDto save(Client client) {
         log.info("save client {}", client);
-        return new ClientDto(this.clientRepository.save(client), this.fixedLifeExpectancy);
+        Client clientDb = this.clientRepository.save(client);
+        this.clientPublisher.send(clientDb);
+        return new ClientDto(clientDb, this.fixedLifeExpectancy);
 
     }
 

@@ -62,7 +62,7 @@ public class ExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
 
-        return ResponseEntity.badRequest().body(errorInfo);
+        return ResponseEntity.unprocessableEntity().body(errorInfo);
     }
 
 
